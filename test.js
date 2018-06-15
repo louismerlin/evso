@@ -1,6 +1,23 @@
 import test from 'ava';
-import {Sevent} from '.';
+import {
+  Sevent,
+  Aggregate
+} from '.';
 
-test('main', t => {
-	t.deepEqual(Sevent, {});
+test('simple aggregate', async t => {
+  const userDescription = {
+    id: 'number',
+    name: 'string',
+    age: 'number'
+  };
+  const aggregate = new Aggregate('users', userDescription);
+  t.is(aggregate.name, 'users');
+  const foo = {
+    id: 0,
+    name: 'Foo',
+    age: 42
+  };
+  const addUser1 = new Sevent(aggregate, {type: 'insert'}, foo);
+  await addUser1.commit();
+  t.is(aggregate.latestSevent().hash, addUser1.hash);
 });
