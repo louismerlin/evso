@@ -1,0 +1,9 @@
+{
+  "name": "sevents",
+  "version": "0.0.0",
+  "description": "Event Sourcing",
+  "main": "index.js",
+  "repository": "https://github.com/louismerlin/sevents",
+  "author": "Louis Merlin <louis.merlin@epfl.ch>",
+  "license": "MIT"
+}
