@@ -1,9 +1,16 @@
 {
-  "name": "sevents",
-  "version": "0.0.0",
-  "description": "Event Sourcing",
-  "main": "index.js",
-  "repository": "https://github.com/louismerlin/sevents",
-  "author": "Louis Merlin <louis.merlin@epfl.ch>",
-  "license": "MIT"
+	"name": "sevents",
+	"version": "0.0.0",
+	"description": "Event Sourcing",
+	"main": "index.js",
+	"repository": "https://github.com/louismerlin/sevents",
+	"author": "Louis Merlin <louis.merlin@epfl.ch>",
+	"license": "MIT",
+	"scripts": {
+		"test": "xo && ava"
+	},
+	"devDependencies": {
+		"ava": "*",
+		"xo": "*"
+	}
 }
