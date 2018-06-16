@@ -1,16 +1,14 @@
 // A Sevent is created when something happens
 // id, aggregate_id, type, data (json), metadata (json), created_at
-function Sevent(aggregate, metadata, data, hash) {
-  this.aggregate = aggregate;
+function Sevent(metadata, data, hash) {
   this.metadata = metadata;
   this.data = data;
   this.hash = hash;
   this.createdAt = Date.now();
-  this.previousSevent = aggregate.latestSevent().hash;
 }
 
-Sevent.prototype.commit = async function () {
-  return this.aggregate.add(this);
+Sevent.prototype.commit = async function (aggregate) {
+  return aggregate.add(this);
 };
 
 // An Aggregate has a Sevents table associated to it

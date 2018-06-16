@@ -17,7 +17,7 @@ test('simple aggregate', async t => {
     name: 'Foo',
     age: 42
   };
-  const addUser1 = new Sevent(aggregate, {type: 'insert'}, foo);
-  await addUser1.commit();
+  const addUser1 = new Sevent({type: 'insert'}, foo);
+  await addUser1.commit(aggregate);
   t.is(aggregate.latestSevent().hash, addUser1.hash);
 });
