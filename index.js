@@ -14,15 +14,31 @@ Sevent.prototype.commit = async function (aggregate) {
 // An Aggregate has a Sevents table associated to it
 function Aggregate(name) {
   this.name = name;
-  this.sevents = [{hash: 0}];
+  this.sevents = [{hash: ''}];
+  this.branches = [];
+  this.table = [];
 }
-
-Aggregate.prototype.add = async function (sevent) {
-  this.sevents = this.sevents.concat(sevent);
-};
 
 Aggregate.prototype.latestSevent = function () {
   return this.sevents[this.sevents.length - 1];
+};
+
+Aggregate.prototype.add = async function (sevent) {
+  if (sevent.metadata.prevHash === this.latestSevent().hash) {
+    this.sevents = this.sevents.concat(sevent);
+    if (sevent.metadata.type === 'insert') {
+      if (this.table[sevent.data.id]) {
+        throw new Error('Duplicate index');
+      } else {
+        this.table[sevent.data.id] = sevent.data;
+      }
+    // } else if (sevent.metadata.type === 'delete') {
+    // } else if (sevent.metadata.type === 'modify') {
+    // }  else if SPECIAL EVENT
+    }
+  } else {
+    this.branches = this.branches.concat(sevent);
+  }
 };
 
 // Reactors react to certain events
