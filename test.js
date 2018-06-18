@@ -46,3 +46,14 @@ test('multiple add events', async t => {
   await addUser2.commit(aggregate);
   t.deepEqual(aggregate.table, users);
 });
+
+test('catching up', async t => {
+  const aggregate = new Aggregate('users', userDescription);
+  const addUser2 = new Ev({type: 'insert', prevHash: '0x01', catchUp: '0x10'}, users[2], '0x02');
+  await addUser2.commit(aggregate);
+  t.deepEqual(aggregate.table, []);
+  t.deepEqual(aggregate.branches, [addUser2]);
+  const catchUp = new Ev({type: 'catchUp', prevHash: ''}, users.slice(0, 2), '0x10');
+  await catchUp.commit(aggregate);
+  t.deepEqual(aggregate.table, users);
+});

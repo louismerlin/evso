@@ -24,7 +24,8 @@ Aggregate.prototype.latestEv = function () {
 };
 
 Aggregate.prototype.add = async function (ev) {
-  if (ev.metadata.prevHash === this.latestEv().hash) {
+  const latestHash = this.latestEv().hash;
+  if (ev.metadata.prevHash === latestHash || ev.metadata.catchUp === latestHash) {
     this.evs = this.evs.concat(ev);
     if (ev.metadata.type === 'insert') {
       if (this.table[ev.data.id]) {
@@ -32,13 +33,27 @@ Aggregate.prototype.add = async function (ev) {
       } else {
         this.table[ev.data.id] = ev.data;
       }
+    } else if (ev.metadata.type === 'catchUp') {
+      this.table = ev.data;
+      await this.reverseAdd(ev.hash);
+    }
     // } else if (ev.metadata.type === 'delete') {
     // } else if (ev.metadata.type === 'modify') {
+    // } else if (ev.metadata.type === 'merge') {
     // }  else if SPECIAL EVENT
-    }
   } else {
     this.branches = this.branches.concat(ev);
   }
+};
+
+Aggregate.prototype.reverseAdd = async function (hash) {
+  const toBeAdded = ev => ev.metadata.prevHash === hash || ev.metadata.catchUp === hash;
+  const toAdd = this.branches.filter(toBeAdded);
+  toAdd.forEach(async ev => {
+    await this.add(ev);
+    await this.reverseAdd(ev.hash);
+  });
+  this.branches = this.branches.filter(ev => !toBeAdded(ev));
 };
 
 // Reactors react to certain events
