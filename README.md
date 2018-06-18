@@ -1,2 +1,2 @@
-# sevents
+# evso
 Event Sourcing

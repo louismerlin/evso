@@ -1,6 +1,6 @@
 import test from 'ava';
 import {
-  Sevent,
+  Ev,
   Aggregate
 } from '.';
 
@@ -31,18 +31,18 @@ const users = [
 test('simple aggregate', async t => {
   const aggregate = new Aggregate('users', userDescription);
   t.is(aggregate.name, 'users');
-  const addUser = new Sevent({type: 'insert', prevHash: ''}, users[0], '0x00');
+  const addUser = new Ev({type: 'insert', prevHash: ''}, users[0], '0x00');
   await addUser.commit(aggregate);
-  t.is(aggregate.latestSevent().hash, addUser.hash);
+  t.is(aggregate.latestEv().hash, addUser.hash);
 });
 
 test('multiple add events', async t => {
   const aggregate = new Aggregate('users', userDescription);
-  const addUser0 = new Sevent({type: 'insert', prevHash: ''}, users[0], '0x00');
+  const addUser0 = new Ev({type: 'insert', prevHash: ''}, users[0], '0x00');
   await addUser0.commit(aggregate);
-  const addUser1 = new Sevent({type: 'insert', prevHash: '0x00'}, users[1], '0x01');
+  const addUser1 = new Ev({type: 'insert', prevHash: '0x00'}, users[1], '0x01');
   await addUser1.commit(aggregate);
-  const addUser2 = new Sevent({type: 'insert', prevHash: '0x01'}, users[2], '0x02');
+  const addUser2 = new Ev({type: 'insert', prevHash: '0x01'}, users[2], '0x02');
   await addUser2.commit(aggregate);
   t.deepEqual(aggregate.table, users);
 });
