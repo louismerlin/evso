@@ -7,10 +7,6 @@ function Ev(metadata, data, hash) {
   this.createdAt = Date.now();
 }
 
-Ev.prototype.commit = async function (aggregate) {
-  return aggregate.add(this);
-};
-
 // An Aggregate has a Sevents table associated to it
 function Aggregate(name) {
   this.name = name;
@@ -32,10 +28,11 @@ Aggregate.prototype.add = async function (ev) {
         throw new Error('Duplicate index');
       } else {
         this.table[ev.data.id] = ev.data;
+        return this;
       }
     } else if (ev.metadata.type === 'catchUp') {
       this.table = ev.data;
-      await this.reverseAdd(ev.hash);
+      return this.reverseAdd(ev.hash);
     }
     // } else if (ev.metadata.type === 'delete') {
     // } else if (ev.metadata.type === 'modify') {
@@ -43,6 +40,7 @@ Aggregate.prototype.add = async function (ev) {
     // }  else if SPECIAL EVENT
   } else {
     this.branches = this.branches.concat(ev);
+    return this;
   }
 };
 
@@ -54,6 +52,7 @@ Aggregate.prototype.reverseAdd = async function (hash) {
     await this.reverseAdd(ev.hash);
   });
   this.branches = this.branches.filter(ev => !toBeAdded(ev));
+  return this;
 };
 
 // Reactors react to certain events
