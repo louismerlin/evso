@@ -19,6 +19,8 @@ Aggregate.prototype.latestEv = function () {
   return this.evs[this.evs.length - 1];
 };
 
+const clone = x => JSON.parse(JSON.stringify(x));
+
 Aggregate.prototype.add = async function (ev) {
   const latestHash = this.latestEv().hash;
   if (ev.metadata.prevHash === latestHash || ev.metadata.catchUp === latestHash) {
@@ -27,11 +29,11 @@ Aggregate.prototype.add = async function (ev) {
       if (this.table[ev.data.id]) {
         throw new Error('Duplicate index');
       } else {
-        this.table[ev.data.id] = ev.data;
+        this.table[ev.data.id] = clone(ev.data);
         return this;
       }
     } else if (ev.metadata.type === 'catchUp') {
-      this.table = ev.data;
+      this.table = clone(ev.data);
       return this.reverseAdd(ev.hash);
     }
     // } else if (ev.metadata.type === 'delete') {
