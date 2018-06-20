@@ -19,7 +19,13 @@ Aggregate.prototype.latestEv = function () {
   return this.evs[this.evs.length - 1];
 };
 
-const clone = x => JSON.parse(JSON.stringify(x));
+Aggregate.prototype.clone = function () {
+  const agg = new Aggregate(this.name);
+  agg.evs = this.evs;
+  agg.branches = this.branches;
+  agg.table = this.table;
+  return agg;
+};
 
 Aggregate.prototype.add = async function (ev) {
   const latestHash = this.latestEv().hash;
@@ -29,11 +35,11 @@ Aggregate.prototype.add = async function (ev) {
       if (this.table[ev.data.id]) {
         throw new Error('Duplicate index');
       } else {
-        this.table[ev.data.id] = clone(ev.data);
-        return this;
+        this.table[ev.data.id] = ev.data;
+        return this.clone();
       }
     } else if (ev.metadata.type === 'catchUp') {
-      this.table = clone(ev.data);
+      this.table = ev.data;
       return this.reverseAdd(ev.hash);
     }
     // } else if (ev.metadata.type === 'delete') {
@@ -42,7 +48,7 @@ Aggregate.prototype.add = async function (ev) {
     // }  else if SPECIAL EVENT
   } else {
     this.branches = this.branches.concat(ev);
-    return this;
+    return this.clone();
   }
 };
 
@@ -54,7 +60,7 @@ Aggregate.prototype.reverseAdd = async function (hash) {
     await this.reverseAdd(ev.hash);
   });
   this.branches = this.branches.filter(ev => !toBeAdded(ev));
-  return this;
+  return this.clone();
 };
 
 // Reactors react to certain events
