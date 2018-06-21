@@ -36,7 +36,7 @@ Aggregate.prototype.add = async function (ev) {
         throw new Error('Duplicate index');
       } else {
         this.table[ev.data.id] = ev.data;
-        return this.clone();
+        return this.reverseAdd(ev.hash);
       }
     } else if (ev.metadata.type === 'catchUp') {
       this.table = ev.data;
@@ -57,7 +57,6 @@ Aggregate.prototype.reverseAdd = async function (hash) {
   const toAdd = this.branches.filter(toBeAdded);
   toAdd.forEach(async ev => {
     await this.add(ev);
-    await this.reverseAdd(ev.hash);
   });
   this.branches = this.branches.filter(ev => !toBeAdded(ev));
   return this.clone();

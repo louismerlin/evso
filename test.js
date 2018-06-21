@@ -47,6 +47,17 @@ test('multiple add events', async t => {
   t.deepEqual(aggregate.table, users);
 });
 
+test('unordered add events', async t => {
+  let aggregate = new Aggregate('users', userDescription);
+  const addUser2 = new Ev({type: 'insert', prevHash: '0x01'}, users[2], '0x02');
+  aggregate = await aggregate.add(addUser2);
+  const addUser1 = new Ev({type: 'insert', prevHash: '0x00'}, users[1], '0x01');
+  aggregate = await aggregate.add(addUser1);
+  const addUser0 = new Ev({type: 'insert', prevHash: ''}, users[0], '0x00');
+  aggregate = await aggregate.add(addUser0);
+  t.deepEqual(aggregate.table, users);
+});
+
 test('catching up', async t => {
   let aggregate = new Aggregate('users', userDescription);
   const addUser2 = new Ev({type: 'insert', prevHash: '0x01', catchUp: '0x10'}, users[2], '0x02');
