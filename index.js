@@ -34,10 +34,10 @@ Aggregate.prototype.add = async function (ev) {
 
     // On Insert
     if (ev.metadata.type === 'insert') {
-      if (this.table[ev.data.id]) {
+      if (this.table.some(x => x.id === ev.data.id)) {
         throw new Error('Duplicate index');
       } else {
-        this.table[ev.data.id] = ev.data;
+        this.table = this.table.concat(ev.data);
         return this.reverseAdd(ev.hash);
       }
 
@@ -48,15 +48,24 @@ Aggregate.prototype.add = async function (ev) {
 
     // On Modify
     } else if (ev.metadata.type === 'modify') {
-      if (this.table[ev.data.id]) {
+      if (this.table.some(x => x.id === ev.data.id)) {
+        const elem = this.table.find(x => x.id === ev.data.id);
         Object.keys(ev.data).filter(x => x !== 'id').forEach(x => {
-          this.table[ev.data.id][x] = ev.data[x];
+          elem[x] = ev.data[x];
         });
         return this.clone();
       }
       throw new Error('Could not find object to modify');
+
+    // On Delete
+    } else if (ev.metadata.type === 'delete') {
+      const i = this.table.findIndex(x => x.id === ev.data);
+      if (i >= 0) {
+        this.table.splice(i, 1);
+        return this.clone();
+      }
+      throw new Error('Could not find object to delete');
     }
-    // } else if (ev.metadata.type === 'delete') {
     // } else if (ev.metadata.type === 'merge') {
     // }  else if SPECIAL EVENT
   } else {
