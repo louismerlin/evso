@@ -68,3 +68,15 @@ test('catching up', async t => {
   aggregate = await aggregate.add(catchUp);
   t.deepEqual(aggregate.table, users);
 });
+
+test('simple modify', async t => {
+  let aggregate = new Aggregate('users', userDescription);
+  const addUser0 = new Ev({type: 'insert', prevHash: ''}, users[0], '0x00');
+  aggregate = await aggregate.add(addUser0);
+  const addUser1 = new Ev({type: 'insert', prevHash: '0x00'}, users[1], '0x01');
+  aggregate = await aggregate.add(addUser1);
+  const modifyUser0 = new Ev({type: 'modify', prevHash: '0x01'}, {id: 0, name: 'Boo'}, '0x02');
+  aggregate = await aggregate.add(modifyUser0);
+  t.is(aggregate.table[0].name, 'Boo');
+  t.is(aggregate.table[0].age, 42);
+});

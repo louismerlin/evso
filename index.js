@@ -31,6 +31,8 @@ Aggregate.prototype.add = async function (ev) {
   const latestHash = this.latestEv().hash;
   if (ev.metadata.prevHash === latestHash || ev.metadata.catchUp === latestHash) {
     this.evs = this.evs.concat(ev);
+
+    // On Insert
     if (ev.metadata.type === 'insert') {
       if (this.table[ev.data.id]) {
         throw new Error('Duplicate index');
@@ -38,12 +40,23 @@ Aggregate.prototype.add = async function (ev) {
         this.table[ev.data.id] = ev.data;
         return this.reverseAdd(ev.hash);
       }
+
+    // On CatchUp
     } else if (ev.metadata.type === 'catchUp') {
       this.table = ev.data;
       return this.reverseAdd(ev.hash);
+
+    // On Modify
+    } else if (ev.metadata.type === 'modify') {
+      if (this.table[ev.data.id]) {
+        Object.keys(ev.data).filter(x => x !== 'id').forEach(x => {
+          this.table[ev.data.id][x] = ev.data[x];
+        });
+        return this.clone();
+      }
+      throw new Error('Could not find object to modify');
     }
     // } else if (ev.metadata.type === 'delete') {
-    // } else if (ev.metadata.type === 'modify') {
     // } else if (ev.metadata.type === 'merge') {
     // }  else if SPECIAL EVENT
   } else {
