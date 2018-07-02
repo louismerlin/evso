@@ -1,6 +1,6 @@
 {
   "name": "evso",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Event Sourcing",
   "main": "index.js",
   "repository": "https://github.com/louismerlin/evso",
