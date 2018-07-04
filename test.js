@@ -106,11 +106,11 @@ test('insert, modify, delete', async t => {
   const addUser2 = new Ev({type: 'insert', prevHash: '0x01'}, users[2], '0x02');
   aggregate = await aggregate.add(addUser2);
   t.is(aggregate.table.length, 3);
-  const modifyUser2 = new Ev({type: 'modify', prevHash: '0x02'}, {id: 2, name: 'Skelter'}, '0x03');
-  aggregate = await aggregate.add(modifyUser2);
-  t.is(aggregate.table[2].name, 'Skelter');
   const deleteUser1 = new Ev({type: 'delete', prevHash: '0x03'}, 1, '0x04');
   aggregate = await aggregate.add(deleteUser1);
+  const modifyUser2 = new Ev({type: 'modify', prevHash: '0x02'}, {id: 2, name: 'Skelter'}, '0x03');
+  aggregate = await aggregate.add(modifyUser2);
+  t.is(aggregate.table.find(x => x.id === 2).name, 'Skelter');
   t.is(aggregate.table.length, 2);
   t.is(aggregate.table.findIndex(x => x.id === 1), -1);
 });

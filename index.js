@@ -53,7 +53,7 @@ Aggregate.prototype.add = async function (ev) {
         Object.keys(ev.data).filter(x => x !== 'id').forEach(x => {
           elem[x] = ev.data[x];
         });
-        return this.clone();
+        return this.reverseAdd(ev.hash);
       }
       throw new Error('Could not find object to modify');
 
@@ -62,7 +62,7 @@ Aggregate.prototype.add = async function (ev) {
       const i = this.table.findIndex(x => x.id === ev.data);
       if (i >= 0) {
         this.table.splice(i, 1);
-        return this.clone();
+        return this.reverseAdd(ev.hash);
       }
       throw new Error('Could not find object to delete');
     }
