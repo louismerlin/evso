@@ -43,7 +43,7 @@ Aggregate.prototype.add = async function (ev) {
 
     // On CatchUp
     } else if (ev.metadata.type === 'catchUp') {
-      this.table = ev.data;
+      this.table = Object.values(ev.data);
       return this.reverseAdd(ev.hash);
 
     // On Modify
